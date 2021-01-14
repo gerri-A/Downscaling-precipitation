@@ -1,5 +1,4 @@
-# Downscaling-precipitation
-MSc thesis project: super-resolution neural networks: a strategy to downscale model output data
+# MSc thesis project: super-resolution neural networks: a strategy to downscale model output data
 Running complex geophysical models takes a long computation time. Examples of this are the general circulation models, that are used to study the global climate system. These models run at low horizontal resolution (150-400km), because of their computational demand. Hydrological models require high-resolution meteorological data, and often rely on downscaling techniques to obtain high-resolution data from the low-resolution model output data of the general circulation models. In this research, we test a new statistical downscaling method: downscaling using deep neural networks. This method overcomes many of the problems that the currently used downscaling techniques face, and therefore has great potential in downscaling model output data. We built, trained and tested a deep convolutional auto-encoder to see the potential of this technique to downscale model output data, by downscaling meteorological (reanalysis) data as a case study. 
 
 Below is a description of all files and scripts used for the MSc thesis research of Avelon Gerritsma:
@@ -7,7 +6,7 @@ Super-resolution neural networks: a strategy to downscale model output data
 
 This document indicates the order in which the files were created/used, files are indicated with /. 
 In the files are desciptions to explain what is done.
-The precipitation maps are downloaded from https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-20th-century-using-surface-observations-only
+The re-analysis data are downloaded from https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-20th-century-using-surface-observations-only
 Intermediate files (TFRecord files that are rescaled, after step 3) can be found on 4TU.nl name: Data underlying the research on: Downscaling precipitation
 
 The first step was to download the ERA20C data, calculate total daily precipitation sum and upload data to google earth engine (GEE). Use file:
