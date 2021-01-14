@@ -1,0 +1,191 @@
+####GEE### 1. export images
+var imageCollection --> import dataset
+//test subset of images
+var testCollection = imageCollection.filterDate('1979-01-02','1988-01-01')
+                                    .select('total_precipitation')
+
+//print(ERA20C.get("system:id").getInfo())
+//Geometry --> whole world
+function getWGS84Geometry() {
+  return ee.Geometry.Polygon([[180,90],[0,90],[-180,90],[-180,-90],[0,-90],[180,-90],[180,90]], 'EPSG:4326', false)
+}
+//export options
+var image_export_options = {
+  'patchDimensions': [256, 256],
+  'maxFileSize': 104857600,
+  'kernelSize': [256, 256],
+  'compressed': true
+}
+//Get image out of collection
+var collectionID = testCollection.getString('system:id')
+var imageIds = testCollection.map(
+  function(image) {
+    return ee.Feature(null, {
+      'id': collectionID.cat('/').cat(image.id()),
+      'description': image.id().cat('-30km')
+    })
+  }
+)
+var imageIdLocal = imageIds.getInfo()
+print(imageIdLocal)
+
+var foldername = 'ERA51979-1988/'
+function exportImage(feature) {
+  // pad bij  plakken
+  var image =  ee.Image(feature.properties.id);
+    Export.image.toCloudStorage({
+    image: image,
+    scale: 30000,
+    description: feature.properties.description,
+    bucket: 'era-ml-upressing',
+    fileNamePrefix: foldername + feature.properties.description,
+    fileFormat: 'TFRecord',
+    region: getWGS84Geometry(),
+    formatOptions: image_export_options,  
+  })
+  return image
+}
+
+imageIdLocal.features.map(exportImage)
+
+      
+function listFilenames(feature) {
+ return feature.properties.description
+  }
+
+//var filenames = imageIdLocal.features.map(listFilenames)
+Export.table.toCloudStorage({
+  collection: imageIds,
+  description: 'descriptionERA5',
+  bucket: 'era-ml-upressing', 
+  fileNamePrefix: 'ERA51979-1988/descriptionERA5',
+  selectors: 'description'
+  })
+//print(filenames)
+//exportImage(testCollection)
+//imageCollection.evaluate(exportImage)
+
+####### 2. export lonlat file
+
+// Global geometry
+function getWGS84Geometry() {
+  return ee.Geometry.Polygon([[180,90],[0,90],[-180,90],[-180,-90],[0,-90],[180,-90],[180,90]], 'EPSG:4326', false)
+}
+
+
+//export options
+var image_export_options_256 = {
+  'patchDimensions': [256, 256],
+  'maxFileSize': 104857600,
+  'kernelSize': [256, 256],
+  'compressed': true
+}
+var image_export_options_64 = {
+  'patchDimensions': [64, 64],
+  'maxFileSize': 104857600,
+  'kernelSize': [64, 64],
+  'compressed': true
+}
+
+var lonLat  = ee.Image.pixelLonLat()
+print(lonLat)
+
+Map.addLayer(lonLat, {min: -180, max: 180})
+
+// Coarse/ERA20c options
+Export.image.toCloudStorage({
+  image: lonLat,
+  scale: 120000,
+  description: 'lonlat',
+  bucket: 'era-ml-upressing',
+  fileNamePrefix: 'coordinates/lonlat64',
+  fileFormat: 'TFRecord',
+  region: getWGS84Geometry(),
+  formatOptions: image_export_options_64,  
+})
+
+// High resolution (ERA5) options  
+Export.image.toCloudStorage({
+  image: lonLat,
+  scale: 30000,
+  description: 'lonlat',
+  bucket: 'era-ml-upressing',
+  fileNamePrefix: 'coordinates/lonlat256',
+  fileFormat: 'TFRecord',
+  region: getWGS84Geometry(),
+  formatOptions: image_export_options_256,  
+})
+
+### 3. plot image
+import image
+// Visualization palette for total precipitation
+var visTp = {
+  min: 0,
+  max: 0.1,
+  palette: ['#FFFFFF', '#00FFFF', '#0080FF', '#DA00FF', '#FFA400', '#FF0000']
+};
+
+
+Map.addLayer(image,  visTp,
+    'Daily total precipitation sums');
+
+#### 4. export geotiff
+//print(ERA20C.get("system:id").getInfo())
+//Geometry --> whole world
+function getWGS84Geometry() {
+  return ee.Geometry.Polygon([[-27.7,82.5,],[40.2, 82.5],[40.2, 15],[-27.7, 15]], 'EPSG:4326', false)
+}                         
+
+//Get image out of collection
+var collectionID = imageCollection.getString('system:id')
+var imageIds = imageCollection.map(
+  function(image) {
+    return ee.Feature(null, {
+      'id': collectionID.cat('/').cat(image.id()),
+      'description': image.id().cat('-120km')
+    })
+  }
+)
+var imageIdLocal = imageIds.getInfo()
+print(imageIdLocal)
+
+var foldername = 'Predict/'
+function exportImage(feature) {
+  // pad bij  plakken
+  var image =  ee.Image(feature.properties.id);
+    Export.image.toCloudStorage({
+    image: image,
+    scale: 120000,
+    dimensions: [64,64],
+    description: feature.properties.description,
+    bucket: 'era-ml-upressing',
+    fileNamePrefix: foldername + feature.properties.description,
+    fileFormat: 'GeoTIFF',
+    region: getWGS84Geometry(),
+  })
+  return image
+}
+
+imageIdLocal.features.map(exportImage)
+
+##### RUN ALL so you don't have to click on run of every file (max 700 files at the same time)
+// first press F12
+// copy this in the console:
+function runTaskList(){
+    var tasklist = document.getElementsByClassName('task local type-EXPORT_IMAGE awaiting-user-config');
+    for (var i = 0; i < tasklist.length; i++)
+            tasklist[i].getElementsByClassName('run-button')[0].click();
+}
+
+function confirmAll() {
+    var ok = document.getElementsByClassName('goog-buttonset-default goog-buttonset-action');
+    for (var i = 0; i < ok.length; i++)
+        ok[i].click();
+}
+
+runTaskList();
+confirmAll();
+
+
+
+
