@@ -21,8 +21,8 @@ at precipitation map in GEE and lastly a script to download tiles as geotiff (wi
 Next step is to open the image tiles in Jypyterlab/Colab and normalize the data, this is done in two steps:
 1. data^0.2
 2. MinMaxScaler fitted on high resolution data
-File:
-/3.Normalize_data.ipynb 
+
+File: /3.Normalize_data.ipynb 
 'scaler_new.pkl' is the fitted scaler, stored in data folder.
 After the scaler is defined, this scaler is used to rescale all the data. The image tiles are cut into patches and saved 
 in big TFRecord files (quicker to reload all the data for training Neural network).
