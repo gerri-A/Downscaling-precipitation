@@ -24,10 +24,10 @@ Next step is to open the image tiles in Jypyterlab/Colab and normalize the data,
 
 File: /3.Normalize_data.ipynb 
 'scaler_new.pkl' is the fitted scaler, stored in data folder.
-After the scaler is defined, this scaler is used to rescale all the data. The image tiles are cut into patches and saved 
+After the scaler is defined, this scaler is used to rescale all data. The image tiles are cut into patches and saved 
 in big TFRecord files (quicker to reload all the data for training Neural network).
 
-In \4a.Deep_convolutional_auto-encoder.ipynb  is the auto-encoder programmed with tensorflow. First data is loaded 
+In \4a.Deep_convolutional_auto-encoder.ipynb  is the auto-encoder programmed using tensorflow software. First, data is loaded 
 (big files created with former step). Model is set-up, compiled. Custom loss function is defined. At model.compile, 
 you can choose between loss=MSE or loss=loss_function == custom loss.
 Then model.summary and model.plot show a schematic representation of the neural network.
